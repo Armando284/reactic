@@ -43,6 +43,20 @@ function createDom(fiber: Fiber): HTMLElement | Text {
   return dom
 }
 
+function commitRoot() {
+  commitWork(rootInProgress.child)
+  rootInProgress = null
+}
+
+function commitWork(fiber: Fiber) {
+  if (!fiber) return
+
+  const domParent = fiber.parent.dom
+  domParent.appendChild(fiber.dom)
+  commitWork(fiber.child)
+  commitWork(fiber.sibling)
+}
+
 function render(element: ReacticElement, container: HTMLElement) {
   rootInProgress = {
     dom: container,
@@ -56,10 +70,6 @@ function render(element: ReacticElement, container: HTMLElement) {
 
 let nextUnitOfWork = null
 let rootInProgress = null
-
-function commitRoot() {
-  // TODO DOM reconciliation
-}
 
 function workLoop(deadline: IdleDeadline) {
   let shouldYield = false
