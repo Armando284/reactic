@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "lib": ["DOM", "es2015"],
+    "jsx": "react",
+    "jsxFactory": "Reactic.createElement",
+    "module": "ES6",
+    "moduleResolution": "Node10",
+    "allowJs": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
+}
