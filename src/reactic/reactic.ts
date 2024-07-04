@@ -48,6 +48,26 @@ function render(element: ReacticElement, container: HTMLElement | Text) {
   container.appendChild(node)
 }
 
+let nextUnitOfWork = null
+
+function workLoop(deadline: IdleDeadline) {
+  let shouldYield = false
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork)
+    shouldYield = deadline.timeRemaining() < 1
+  }
+  requestIdleCallback(workLoop)
+}
+
+requestIdleCallback(workLoop)
+
+function performUnitOfWork(nextUnitOfWork) {
+  // TODO
+  // add the element to the DOM
+  // create the fibers for the element’s children
+  // select the next unit of work
+}
+
 export const Reactic = {
   createElement,
   render,
