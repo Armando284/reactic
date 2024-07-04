@@ -44,23 +44,35 @@ function createDom(fiber: Fiber): HTMLElement | Text {
 }
 
 function render(element: ReacticElement, container: HTMLElement) {
-  // TODO set next unit of work
-  nextUnitOfWork = {
+  rootInProgress = {
     dom: container,
     props: {
       children: [element],
     },
   }
+
+  nextUnitOfWork = rootInProgress
 }
 
 let nextUnitOfWork = null
+let rootInProgress = null
+
+function commitRoot() {
+  // TODO DOM reconciliation
+}
 
 function workLoop(deadline: IdleDeadline) {
   let shouldYield = false
+
   while (nextUnitOfWork && !shouldYield) {
     nextUnitOfWork = performUnitOfWork(nextUnitOfWork)
     shouldYield = deadline.timeRemaining() < 1
   }
+
+  if (!nextUnitOfWork && rootInProgress) {
+    commitRoot()
+  }
+
   requestIdleCallback(workLoop)
 }
 
@@ -71,9 +83,7 @@ function performUnitOfWork(fiber: Fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber)
   }
-  if (fiber.parent) {
-    fiber.parent.dom.appendChild(fiber.dom)
-  }
+  // Can not render here, it'll cause the user to see unnfinished interface if the browser stops the algorithm for a moment.
 
   // create new fibers
   const elements = fiber.props.children
