@@ -1,6 +1,10 @@
-'use strict'
+import { ReacticElement, Props, ReacticTextElement } from './typings'
 
-function createElement(type, props, ...children) {
+function createElement(
+  type: keyof HTMLElementTagNameMap,
+  props,
+  ...children
+): ReacticElement {
   return {
     type,
     props: {
@@ -12,7 +16,7 @@ function createElement(type, props, ...children) {
   }
 }
 
-function createTextElement(text) {
+function createTextElement(text: string): ReacticTextElement {
   return {
     type: 'TEXT_ELEMENT',
     props: {
@@ -22,13 +26,13 @@ function createTextElement(text) {
   }
 }
 
-function render(element, container) {
+function render(element: ReacticElement, container: HTMLElement | Text) {
   const node =
     element.type === 'TEXT_ELEMENT'
-      ? document.createTextElement('')
+      ? document.createTextNode('')
       : document.createElement(element.type)
 
-  const isProperty = (key) => key !== 'children'
+  const isProperty = (key: string) => key !== 'children'
 
   Object.keys(element.props)
     .filter(isProperty)
@@ -37,12 +41,14 @@ function render(element, container) {
     })
 
   element.props.children.forEach((child) => {
+    // TODO: What happens if the container is a Text node
     render(child, node)
   })
 
   container.appendChild(node)
 }
 
-const Reactic = {
+export const Reactic = {
   createElement,
+  render,
 }
