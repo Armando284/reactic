@@ -20,5 +20,7 @@ interface Fiber {
   type: keyof HTMLElementTagNameMap | 'TEXT_ELEMENT'
   props: Props
   parent: Fiber
+  child?: Fiber
+  sibling?: Fiber
   dom: HTMLElement | Text
 }
