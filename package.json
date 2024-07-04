@@ -4,7 +4,8 @@
   "description": "A lightweight, custom-built React-like library to understand the core concepts of React, including the Virtual DOM, reconciliation, and state management.",
   "main": "reactic.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "pnpm tsc --watch"
   },
   "keywords": [
     "react",
@@ -16,5 +17,11 @@
   ],
   "repository": "armando284/reactic",
   "author": "Armando José Peña Tamayo",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  },
+  "dependencies": {
+    "@types/node": "^20.14.9"
+  }
 }
