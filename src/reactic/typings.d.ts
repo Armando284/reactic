@@ -15,3 +15,10 @@ export interface ReacticTextElement {
     children: []
   }
 }
+
+interface Fiber {
+  type: keyof HTMLElementTagNameMap | 'TEXT_ELEMENT'
+  props: Props
+  parent: Fiber
+  dom: HTMLElement | Text
+}
