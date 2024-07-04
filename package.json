@@ -1,0 +1,20 @@
+{
+  "name": "reactic",
+  "version": "1.0.0",
+  "description": "A lightweight, custom-built React-like library to understand the core concepts of React, including the Virtual DOM, reconciliation, and state management.",
+  "main": "reactic.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "library",
+    "framework",
+    "virtual-dom",
+    "reconciliation",
+    "state-management"
+  ],
+  "repository": "armando284/reactic",
+  "author": "Armando José Peña Tamayo",
+  "license": "MIT"
+}
