@@ -1,5 +1,5 @@
 export interface Props {
-  [key: string]: string | number
+  [key: string]: string | number | EventListenerOrEventListenerObject
   children: ReacticElement[]
 }
 
