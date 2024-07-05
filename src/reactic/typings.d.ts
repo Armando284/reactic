@@ -6,8 +6,8 @@ export type ElementType =
   | Function
 
 export interface Props {
-  [key: string]: string | number | EventListenerOrEventListenerObject
-  children: ReacticElement[]
+  [key: string]: any
+  children: (ReacticElement | ReacticTextElement)[]
 }
 
 export interface ReacticElement {
@@ -23,14 +23,14 @@ export interface ReacticTextElement {
   }
 }
 
-interface Fiber {
+export interface Fiber {
   type?: ElementType
   props: Props
   parent?: Fiber
   child?: Fiber
   sibling?: Fiber
   alternate?: Fiber
-  dom: DomELement
+  dom: DomElement
   effectTag?: 'UPDATE' | 'PLACEMENT' | 'DELETION'
   hooks?: Hook[]
 }
