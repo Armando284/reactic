@@ -24,12 +24,18 @@ export interface ReacticTextElement {
 }
 
 interface Fiber {
-  type: ElementType
+  type?: ElementType
   props: Props
-  parent: Fiber
+  parent?: Fiber
   child?: Fiber
   sibling?: Fiber
   alternate?: Fiber
   dom: DomELement
   effectTag?: 'UPDATE' | 'PLACEMENT' | 'DELETION'
+  hooks?: Hook[]
+}
+
+export interface Hook {
+  state: any
+  queue: any[]
 }

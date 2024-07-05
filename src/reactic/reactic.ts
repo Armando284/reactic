@@ -5,6 +5,7 @@ import {
   Props,
   DomElement,
   ElementType,
+  Hook,
 } from './typings'
 
 function createElement(
@@ -99,6 +100,7 @@ function updateDom(dom: DomElement, prevProps: Props, nextProps: Props) {
       )
     })
 }
+
 function commitRoot() {
   deletions.forEach(commitWork)
   commitWork(rootInProgress.child)
@@ -152,8 +154,8 @@ function render(element: ReacticElement, container: HTMLElement) {
 
 let nextUnitOfWork = null
 let rootInProgress = null
-let currentRoot = null
-let deletions = null
+let currentRoot: Fiber = null
+let deletions: Fiber[] = null
 
 function workLoop(deadline: IdleDeadline) {
   let shouldYield = false
@@ -194,11 +196,49 @@ function performUnitOfWork(fiber: Fiber) {
   }
 }
 
+let workingFiber: Fiber = null
+let hookIndex = null
+
 function updateFunctionComponent(fiber: Fiber) {
+  workingFiber = fiber
+  hookIndex = 0
+  workingFiber.hooks = []
   // Executes the function to get the children
   const type = fiber.type as Function
   const children = [type(fiber.props)]
   reconcileChildren(fiber, children)
+}
+
+function useState(initial: any) {
+  const oldHook =
+    workingFiber.alternate &&
+    workingFiber.alternate.hooks &&
+    workingFiber.alternate.hooks[hookIndex]
+
+  const hook: Hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: [],
+  }
+
+  const actions: Function[] = oldHook ? oldHook.queue : []
+  actions.forEach((action) => {
+    hook.state = action(hook.state)
+  })
+
+  const setState = (action: Function) => {
+    hook.queue.push(action)
+    workingFiber = {
+      dom: currentRoot.dom,
+      props: currentRoot.props,
+      alternate: currentRoot,
+    }
+    nextUnitOfWork = workingFiber
+    deletions = []
+  }
+
+  workingFiber.hooks.push(hook)
+  hookIndex++
+  return [hook.state, setState]
 }
 
 function updateHostComponent(fiber: Fiber) {
@@ -263,4 +303,5 @@ function reconcileChildren(fiberInProgress: Fiber, elements: ReacticElement[]) {
 export const Reactic = {
   createElement,
   render,
+  useState,
 }
