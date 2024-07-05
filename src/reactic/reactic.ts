@@ -1,4 +1,11 @@
-import { ReacticElement, ReacticTextElement, Fiber, Props } from './typings'
+import {
+  ReacticElement,
+  ReacticTextElement,
+  Fiber,
+  Props,
+  DomElement,
+  ElementType,
+} from './typings'
 
 function createElement(
   type: keyof HTMLElementTagNameMap,
@@ -26,9 +33,14 @@ function createTextElement(text: string): ReacticTextElement {
   }
 }
 
-function createDom(fiber: Fiber): HTMLElement | Text {
+function createDom(fiber: Fiber): DomElement {
+  // TODO validate Function type element
+  if (fiber.type instanceof Function) {
+    throw new Error('Root element should not be a Function type')
+  }
+
   const dom =
-    fiber.type == 'TEXT_ELEMENT'
+    fiber.type === 'TEXT_ELEMENT'
       ? document.createTextNode('')
       : document.createElement(fiber.type)
 
@@ -46,11 +58,7 @@ const isNew = (prev: Props, next: Props) => (key: string) =>
 
 const isGone = (prev: Props, next: Props) => (key: string) => !(key in next)
 
-function updateDom(
-  dom: HTMLElement | Text,
-  prevProps: Props,
-  nextProps: Props
-) {
+function updateDom(dom: DomElement, prevProps: Props, nextProps: Props) {
   //Remove old or changed event listeners
   Object.keys(prevProps)
     .filter(isEvent)
@@ -101,19 +109,31 @@ function commitRoot() {
 function commitWork(fiber: Fiber) {
   if (!fiber) return
 
-  const domParent = fiber.parent.dom
+  let domParentFiber = fiber.parent
+  while (!domParentFiber.dom) {
+    domParentFiber = domParentFiber.parent
+  }
+  const domParent = domParentFiber.dom
 
   if (fiber.effectTag === 'PLACEMENT' && fiber.dom != null) {
     domParent.appendChild(fiber.dom)
   } else if (fiber.effectTag === 'UPDATE' && fiber.dom != null) {
     updateDom(fiber.dom, fiber.alternate.props, fiber.props)
   } else if (fiber.effectTag === 'DELETION') {
-    domParent.removeChild(fiber.dom)
+    commitDeletion(fiber, domParent)
   }
 
   domParent.appendChild(fiber.dom)
   commitWork(fiber.child)
   commitWork(fiber.sibling)
+}
+
+function commitDeletion(fiber: Fiber, domParent: DomElement) {
+  if (fiber.dom) {
+    domParent.removeChild(fiber.dom)
+  } else {
+    commitDeletion(fiber.child, domParent)
+  }
 }
 
 function render(element: ReacticElement, container: HTMLElement) {
@@ -153,25 +173,39 @@ function workLoop(deadline: IdleDeadline) {
 requestIdleCallback(workLoop)
 
 function performUnitOfWork(fiber: Fiber) {
-  // add dom node
-  if (!fiber.dom) {
-    fiber.dom = createDom(fiber)
+  const isFunctionComponent = (fiber.type as any) instanceof Function
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber)
+  } else {
+    updateHostComponent(fiber)
   }
-  // Can not render here, it'll cause the user to see unnfinished interface if the browser stops the algorithm for a moment.
 
-  // create new fibers
-  const elements = fiber.props.children
-  reconcileChildren(fiber, elements)
   if (fiber.child) {
     return fiber.child
   }
+
   let nextFiber = fiber
+
   while (nextFiber) {
     if (nextFiber.sibling) {
       return nextFiber.sibling
     }
     nextFiber = nextFiber.parent
   }
+}
+
+function updateFunctionComponent(fiber: Fiber) {
+  // Executes the function to get the children
+  const type = fiber.type as Function
+  const children = [type(fiber.props)]
+  reconcileChildren(fiber, children)
+}
+
+function updateHostComponent(fiber: Fiber) {
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber)
+  }
+  reconcileChildren(fiber, fiber.props.children)
 }
 
 function reconcileChildren(fiberInProgress: Fiber, elements: ReacticElement[]) {

@@ -1,10 +1,17 @@
+export type DomElement = HTMLElement | Text
+
+export type ElementType =
+  | keyof HTMLElementTagNameMap
+  | 'TEXT_ELEMENT'
+  | Function
+
 export interface Props {
   [key: string]: string | number | EventListenerOrEventListenerObject
   children: ReacticElement[]
 }
 
 export interface ReacticElement {
-  type: keyof HTMLElementTagNameMap | 'TEXT_ELEMENT'
+  type: ElementType
   props: Props
 }
 
@@ -17,12 +24,12 @@ export interface ReacticTextElement {
 }
 
 interface Fiber {
-  type: keyof HTMLElementTagNameMap | 'TEXT_ELEMENT'
+  type: ElementType
   props: Props
   parent: Fiber
   child?: Fiber
   sibling?: Fiber
   alternate?: Fiber
-  dom: HTMLElement | Text
+  dom: DomELement
   effectTag?: 'UPDATE' | 'PLACEMENT' | 'DELETION'
 }
