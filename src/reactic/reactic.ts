@@ -125,7 +125,6 @@ function commitWork(fiber: Fiber) {
     commitDeletion(fiber, domParent)
   }
 
-  domParent.appendChild(fiber.dom)
   commitWork(fiber.child)
   commitWork(fiber.sibling)
 }
@@ -155,7 +154,7 @@ function render(element: ReacticElement, container: HTMLElement) {
 let nextUnitOfWork = null
 let rootInProgress = null
 let currentRoot: Fiber = null
-let deletions: Fiber[] = null
+let deletions: Fiber[] = []
 
 function workLoop(deadline: IdleDeadline) {
   let shouldYield = false
