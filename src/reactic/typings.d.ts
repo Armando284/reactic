@@ -22,5 +22,7 @@ interface Fiber {
   parent: Fiber
   child?: Fiber
   sibling?: Fiber
+  alternate?: Fiber
   dom: HTMLElement | Text
+  effectTag?: 'UPDATE' | 'PLACEMENT' | 'DELETION'
 }
