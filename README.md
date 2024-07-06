@@ -31,7 +31,7 @@ Here's a basic example using Reactic:
 ```javascript
 import Reactic from './reactic.js';
 
-/** @jsx Didact.createElement */
+/** @jsx Reactic.createElement */
 function Counter() {
   const [state, setState] = Reactic.useState(1)
   return (
